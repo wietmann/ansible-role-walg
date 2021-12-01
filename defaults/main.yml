@@ -1,18 +1,20 @@
 ---
-postgresql_data_dir: "/srv/pgsql11"
-postgresql_config_path: "/srv/pgsql11"
-postgresql_service: "postgresql-11"
-
 walg_binary_dir: "/usr/local/bin"
 walg_version: "0.2.15"
-walg_postgres_home_dir: "/var/lib/pgsql"
 walg_logs_dir: "/var/log/wal-g"
 
+# PostgreSQL config block
+# These vars depend on your PG configuration
+# TODO: Make all this PG mess dynamic
 walg_user: postgres
 walg_group: postgres
+walg_postgres_home_dir: "/var/lib/pgsql"
+walg_pg_data_dir: "/var/lib/pgsql/data"
+walg_pg_config_path: "{{ walg_pg_data_dir }}"
+walg_pg_service: "postgresql"
 
 walg_conf:
-  PGDATA: "{{ postgresql_data_dir }}"
+  PGDATA: "{{ walg_pg_data_dir }}"
   PGHOST: "/var/run/postgresql"
   WALG_FILE_PREFIX: "/pg_backup"
   WALG_COMPRESSION_METHOD: "brotli"
@@ -21,7 +23,7 @@ walg_conf:
 walg_configure_logrotate: True
 walg_configure_crontab: True
 
-walg_backup_cmd: "{{ walg_binary_dir }}/wal-g backup-push {{ postgresql_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
+walg_backup_cmd: "{{ walg_binary_dir }}/wal-g backup-push {{ walg_pg_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
 walg_prune_cmd: "{{ walg_binary_dir }}/wal-g delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
 
 walg_backup_cron_minute: "30"

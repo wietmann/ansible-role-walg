@@ -80,7 +80,7 @@
 
 # - name: Configure postgresql.conf global settings.
 #   lineinfile:
-#     dest: "{{ postgresql_config_path }}/postgresql.conf"
+#     dest: "{{ walg_pg_config_path }}/postgresql.conf"
 #     regexp: "^#?{{ item.option }}.+$"
 #     line: "{{ item.option }} = '{{ item.value }}'"
 #     state: "{{ item.state | default('present') }}"
