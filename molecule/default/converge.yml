@@ -1,0 +1,53 @@
+---
+- name: Run role
+  hosts: all
+  become: yes
+
+  vars:
+    postgresql_enablerepo: "pgdg11"
+    postgresql_version: 11
+    postgresql_bin_path: /usr/pgsql-11/bin
+    postgresql_data_dir: /var/lib/pgsql/11/data
+    postgresql_config_path: /var/lib/pgsql/11/data
+    postgresql_daemon: postgresql-11.service
+    postgresql_packages:
+      - postgresql11
+      - postgresql11-server
+    postgresql_global_config_options:
+      - option: data_directory
+        value: "{{ postgresql_data_dir }}"
+
+    # walg_postgres_home_dir: "/var/lib/pgsql"
+    walg_user: "{{ postgresql_user }}"
+    walg_group: "{{ postgresql_group }}"
+    walg_pg_data_dir: "{{ postgresql_data_dir }}"
+    walg_pg_config_path: "{{ postgresql_config_path }}"
+    walg_pg_service: "{{ postgresql_daemon }}"
+
+  pre_tasks:
+    - name: Update CA certificates
+      yum:
+        name: ca-certificates
+        state: latest
+
+    - name: Install Cron and Logrotate
+      yum:
+        name:
+          - cronie
+          - logrotate
+        state: installed
+
+    - name: Setup PGDG repository
+      yum:
+        name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        state: present
+
+    - name: Create backup dir
+      file:
+        path: "/pg_backup"
+        state: directory
+        mode: 0777
+
+  roles:
+    - role: geerlingguy.postgresql
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
