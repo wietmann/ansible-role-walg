@@ -18,6 +18,8 @@ walg_conf:
   WALG_COMPRESSION_METHOD: "brotli"
   WALG_DELTA_MAX_STEPS: "6"
 
+walg_configure_logrotate: True
+
 walg_cron_jobs:
   - name: "WAL-G: Create daily backup"
     minute: "30"

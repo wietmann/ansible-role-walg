@@ -53,28 +53,29 @@
 # - fail:
 #     msg: DEBUG HALT
 
-# - name: Ensure log directory exists
-#   file:
-#     path: "{{ walg_logs_dir }}"
-#     state: directory
-#     owner: postgres
-#     mode: 0770
-#     seuser: _default
-#     serole: _default
-#     setype: _default
-#     selevel: _default
+- name: Ensure log directory exists
+  file:
+    path: "{{ walg_logs_dir }}"
+    state: directory
+    owner: "{{ walg_user }}"
+    mode: 0770
+    # seuser: _default
+    # serole: _default
+    # setype: _default
+    # selevel: _default
 
-# - name: Add Logrotate configuration
-#   template:
-#     src: templates/walg.logrotate.conf.j2
-#     dest: /etc/logrotate.d/walg
-#     owner: root
-#     group: root
-#     mode: 0644
-#     seuser: _default
-#     serole: _default
-#     setype: _default
-#     selevel: _default
+- name: Add Logrotate configuration
+  template:
+    src: templates/logrotate.conf.j2
+    dest: /etc/logrotate.d/walg
+    owner: root
+    group: root
+    mode: 0644
+    # seuser: _default
+    # serole: _default
+    # setype: _default
+    # selevel: _default
+  when: walg_configure_logrotate
 
 # - name: Configure postgresql.conf global settings.
 #   lineinfile:
