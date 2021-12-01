@@ -3,6 +3,8 @@ walg_binary_dir: "/usr/local/bin"
 walg_version: "0.2.15"
 walg_logs_dir: "/var/log/wal-g"
 
+walg_wal_archive_timeout: 3600
+
 # PostgreSQL config block
 # These vars depend on your PG configuration
 # TODO: Make all this PG mess dynamic
@@ -12,6 +14,15 @@ walg_postgres_home_dir: "/var/lib/pgsql"
 walg_pg_data_dir: "/var/lib/pgsql/data"
 walg_pg_config_path: "{{ walg_pg_data_dir }}"
 walg_pg_service: "postgresql"
+walg_pg_global_config_options:
+  - option: "wal_level"
+    value: "replica"
+  - option: "archive_mode"
+    value: "on"
+  - option: "archive_command"
+    value: "{{ walg_binary_dir }}/wal-g wal-push \"%p\" >> {{ walg_logs_dir }}/wal-push.log 2>&1"
+  - option: "archive_timeout"
+    value: "{{ walg_wal_archive_timeout }}"
 
 walg_conf:
   PGDATA: "{{ walg_pg_data_dir }}"
@@ -22,6 +33,7 @@ walg_conf:
 
 walg_configure_logrotate: True
 walg_configure_crontab: True
+walg_configure_pg_settings: True
 
 walg_backup_cmd: "{{ walg_binary_dir }}/wal-g backup-push {{ walg_pg_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
 walg_prune_cmd: "{{ walg_binary_dir }}/wal-g delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
@@ -53,6 +65,3 @@ walg_cron_jobs:
     month: "{{ walg_prune_cron_month }}"
     weekday: "{{ walg_prune_cron_weekday }}"
     job: "{{ walg_prune_cmd }}"
-
-# PG config
-walg_wal_archive_timeout: 3600

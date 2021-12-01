@@ -78,23 +78,6 @@
     # selevel: _default
   when: walg_configure_logrotate
 
-# - name: Configure postgresql.conf global settings.
-#   lineinfile:
-#     dest: "{{ walg_pg_config_path }}/postgresql.conf"
-#     regexp: "^#?{{ item.option }}.+$"
-#     line: "{{ item.option }} = '{{ item.value }}'"
-#     state: "{{ item.state | default('present') }}"
-#   loop:
-#     - option: "wal_level"
-#       value: "replica"
-#     - option: "archive_mode"
-#       value: "on"
-#     - option: "archive_command"
-#       value: "{{ walg_binary_dir }}/wal-g wal-push \"%p\" >> {{ walg_logs_dir }}/wal-push.log 2>&1"
-#     - option: "archive_timeout"
-#       value: "{{ walg_wal_archive_timeout }}"
-#   notify: restart postgresql
-
 - name: Add cron jobs
   cron:
     user: "{{ walg_user }}"
@@ -109,3 +92,13 @@
     job: "{{ item.job }}"
   loop: "{{ walg_cron_jobs }}"
   when: walg_configure_crontab
+
+- name: Configure postgresql.conf global settings
+  lineinfile:
+    dest: "{{ walg_pg_config_path }}/postgresql.conf"
+    regexp: "^#?{{ item.option }}.+$"
+    line: "{{ item.option }} = '{{ item.value }}'"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ walg_pg_global_config_options }}"
+  notify: restart postgresql
+  when: walg_configure_pg_settings
