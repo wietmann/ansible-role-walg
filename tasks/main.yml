@@ -94,16 +94,17 @@
 #       value: "{{ walg_wal_archive_timeout }}"
 #   notify: restart postgresql
 
-# - name: Add cron jobs
-#   cron:
-#     user: postgres
-#     minute: "{{ item.minute | default('*') }}"
-#     hour: "{{ item.hour | default('*') }}"
-#     day: "{{ item.day | default('*') }}"
-#     month: "{{ item.month | default('*') }}"
-#     weekday: "{{ item.weekday | default('*') }}"
-#     name: "{{ item.name }}"
-#     disabled: "{{ item.disabled | default(False) }}"
-#     state: "{{ item.state | default('present') }}"
-#     job: "{{ item.job }}"
-#   loop: "{{ walg_cron_jobs }}"
+- name: Add cron jobs
+  cron:
+    user: "{{ walg_user }}"
+    minute: "{{ item.minute | default('*') }}"
+    hour: "{{ item.hour | default('*') }}"
+    day: "{{ item.day | default('*') }}"
+    month: "{{ item.month | default('*') }}"
+    weekday: "{{ item.weekday | default('*') }}"
+    name: "{{ item.name }}"
+    disabled: "{{ item.disabled | default(False) }}"
+    state: "{{ item.state | default('present') }}"
+    job: "{{ item.job }}"
+  loop: "{{ walg_cron_jobs }}"
+  when: walg_configure_crontab

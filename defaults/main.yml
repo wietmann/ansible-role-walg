@@ -19,16 +19,38 @@ walg_conf:
   WALG_DELTA_MAX_STEPS: "6"
 
 walg_configure_logrotate: True
+walg_configure_crontab: True
+
+walg_backup_cmd: "{{ walg_binary_dir }}/wal-g backup-push {{ postgresql_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
+walg_prune_cmd: "{{ walg_binary_dir }}/wal-g delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
+
+walg_backup_cron_minute: "30"
+walg_backup_cron_hour: "0"
+walg_backup_cron_day: "*"
+walg_backup_cron_month: "*"
+walg_backup_cron_weekday: "*"
+
+walg_prune_cron_minute: "0"
+walg_prune_cron_hour: "6"
+walg_prune_cron_day: "*"
+walg_prune_cron_month: "*"
+walg_prune_cron_weekday: "*"
 
 walg_cron_jobs:
   - name: "WAL-G: Create daily backup"
-    minute: "30"
-    hour: "0"
-    job: "{{ walg_binary_dir }}/wal-g backup-push {{ postgresql_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
-  - name: "WAL-G: Prune backups older than 12 last full"
-    minute: "0"
-    hour: "6"
-    job: "{{ walg_binary_dir }}/wal-g delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
+    minute: "{{ walg_backup_cron_minute }}"
+    hour: "{{ walg_backup_cron_hour }}"
+    day: "{{ walg_backup_cron_day }}"
+    month: "{{ walg_backup_cron_month }}"
+    weekday: "{{ walg_backup_cron_weekday }}"
+    job: "{{ walg_backup_cmd }}"
+  - name: "WAL-G: Prune old backups"
+    minute: "{{ walg_prune_cron_minute }}"
+    hour: "{{ walg_prune_cron_hour }}"
+    day: "{{ walg_prune_cron_day }}"
+    month: "{{ walg_prune_cron_month }}"
+    weekday: "{{ walg_prune_cron_weekday }}"
+    job: "{{ walg_prune_cmd }}"
 
 # PG config
 walg_wal_archive_timeout: 3600
