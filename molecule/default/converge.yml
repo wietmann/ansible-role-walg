@@ -39,8 +39,27 @@
 
     - name: Setup PGDG repository
       yum:
-        name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_distribution_major_version }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
         state: present
+        # https://blog.tanebox.com/archives/1303/
+        disable_gpg_check: yes
+
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1718201
+    - name: Disable modularity filters (RHEL 8)
+      ini_file:
+        path: /etc/yum.repos.d/pgdg-redhat-all.repo
+        section: "{{ item }}"
+        option: module_hotfixes
+        value: "true"
+      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '8'
+      loop:
+        - pgdg-common
+        - pgdg96
+        - pgdg10
+        - pgdg11
+        - pgdg12
+        - pgdg13
+        - pgdg14
 
     - name: Create backup dir
       file:
