@@ -1,0 +1,32 @@
+---
+postgresql_data_dir: "/srv/pgsql11"
+postgresql_config_path: "/srv/pgsql11"
+postgresql_service: "postgresql-11"
+
+walg_binary_dir: "/usr/local/bin"
+walg_version: "0.2.15"
+walg_postgres_home_dir: "/var/lib/pgsql"
+walg_logs_dir: "/var/log/wal-g"
+
+walg_user: postgres
+walg_group: postgres
+
+walg_conf:
+  PGDATA: "{{ postgresql_data_dir }}"
+  PGHOST: "/var/run/postgresql"
+  WALG_FILE_PREFIX: "/pg_backup"
+  WALG_COMPRESSION_METHOD: "brotli"
+  WALG_DELTA_MAX_STEPS: "6"
+
+walg_cron_jobs:
+  - name: "WAL-G: Create daily backup"
+    minute: "30"
+    hour: "0"
+    job: "{{ walg_binary_dir }}/wal-g backup-push {{ postgresql_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
+  - name: "WAL-G: Prune backups older than 12 last full"
+    minute: "0"
+    hour: "6"
+    job: "{{ walg_binary_dir }}/wal-g delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
+
+# PG config
+walg_wal_archive_timeout: 3600

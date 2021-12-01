@@ -1,0 +1,108 @@
+---
+- name: Gather info about WAL-G binary
+  stat:
+    path: "{{ walg_binary_dir }}/wal-g"
+  register: walg_binary_stats
+
+# TODO: Change to internal regex
+- shell:
+    cmd: "{{ walg_binary_dir }}/wal-g --version | sed 's/^.\\+\\(v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\).\\+$/\\1/'"
+  when: walg_binary_stats.stat.exists
+  changed_when: false
+  failed_when: false
+  register: walg_binary_current_version
+
+- name: Build download URL (pre 1.0.0)
+  set_fact:
+    walg_download_url: "https://github.com/wal-g/wal-g/releases/download/v{{ walg_version }}/wal-g.linux-amd64.tar.gz"
+  when: walg_version is version('1.0.0', '<')
+
+- name: Fail on too modern version
+  fail:
+    msg: "Versions >= 1.0.0 are not implemented yet"
+  when: walg_version is version('1.0.0', '>=')
+
+# - fail:
+#     msg: DEBUG HALT
+
+- name: Fetch WAL-G binary file tarball from Github
+  unarchive:
+    src: "{{ walg_download_url }}"
+    dest: "{{ walg_binary_dir }}"
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0755
+    # seuser: _default
+    # serole: _default
+    # setype: _default
+    # selevel: _default
+  when: walg_binary_stats.stat.exists != True or walg_binary_current_version.stdout_lines[0] != walg_version
+
+# - fail:
+#     msg: DEBUG HALT
+
+- name: Generate WAL-G config
+  copy:
+    dest: "{{ walg_postgres_home_dir }}/.walg.json"
+    content: "{{ walg_conf | to_nice_json }}"
+    owner: "{{ walg_user }}"
+    group: "{{ walg_group }}"
+    mode: 0640
+
+# - fail:
+#     msg: DEBUG HALT
+
+# - name: Ensure log directory exists
+#   file:
+#     path: "{{ walg_logs_dir }}"
+#     state: directory
+#     owner: postgres
+#     mode: 0770
+#     seuser: _default
+#     serole: _default
+#     setype: _default
+#     selevel: _default
+
+# - name: Add Logrotate configuration
+#   template:
+#     src: templates/walg.logrotate.conf.j2
+#     dest: /etc/logrotate.d/walg
+#     owner: root
+#     group: root
+#     mode: 0644
+#     seuser: _default
+#     serole: _default
+#     setype: _default
+#     selevel: _default
+
+# - name: Configure postgresql.conf global settings.
+#   lineinfile:
+#     dest: "{{ postgresql_config_path }}/postgresql.conf"
+#     regexp: "^#?{{ item.option }}.+$"
+#     line: "{{ item.option }} = '{{ item.value }}'"
+#     state: "{{ item.state | default('present') }}"
+#   loop:
+#     - option: "wal_level"
+#       value: "replica"
+#     - option: "archive_mode"
+#       value: "on"
+#     - option: "archive_command"
+#       value: "{{ walg_binary_dir }}/wal-g wal-push \"%p\" >> {{ walg_logs_dir }}/wal-push.log 2>&1"
+#     - option: "archive_timeout"
+#       value: "{{ walg_wal_archive_timeout }}"
+#   notify: restart postgresql
+
+# - name: Add cron jobs
+#   cron:
+#     user: postgres
+#     minute: "{{ item.minute | default('*') }}"
+#     hour: "{{ item.hour | default('*') }}"
+#     day: "{{ item.day | default('*') }}"
+#     month: "{{ item.month | default('*') }}"
+#     weekday: "{{ item.weekday | default('*') }}"
+#     name: "{{ item.name }}"
+#     disabled: "{{ item.disabled | default(False) }}"
+#     state: "{{ item.state | default('present') }}"
+#     job: "{{ item.job }}"
+#   loop: "{{ walg_cron_jobs }}"
