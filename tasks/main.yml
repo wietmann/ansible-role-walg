@@ -5,7 +5,8 @@
   register: walg_binary_stats
 
 # TODO: Change to internal regex
-- shell:
+- name: Get WAL-G version
+  shell:
     cmd: "{{ walg_binary_dir }}/wal-g --version | sed 's/^.\\+\\(v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\).\\+$/\\1/'"
   when: walg_binary_stats.stat.exists
   changed_when: false
@@ -37,7 +38,7 @@
     # serole: _default
     # setype: _default
     # selevel: _default
-  when: walg_binary_stats.stat.exists != True or walg_binary_current_version.stdout_lines[0] != walg_version
+  when: walg_binary_stats.stat.exists != True or walg_binary_current_version.stdout_lines[0] != ('v' + walg_version)
 
 # - fail:
 #     msg: DEBUG HALT
