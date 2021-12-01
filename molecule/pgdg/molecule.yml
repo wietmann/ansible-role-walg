@@ -4,14 +4,14 @@ dependency:
 driver:
   name: docker
 platforms:
-  # - name: centos-7
-  #   image: quay.io/paulfantom/molecule-systemd:centos-7
-  #   pre_build_image: true
-  #   tmpfs:
-  #     - /run
-  #   volumes:
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #   command: /sbin/init
+  - name: centos-7
+    image: quay.io/paulfantom/molecule-systemd:centos-7
+    pre_build_image: true
+    tmpfs:
+      - /run
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    command: /sbin/init
   - name: centos-8
     image: quay.io/paulfantom/molecule-systemd:centos-8
     pre_build_image: true
