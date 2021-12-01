@@ -10,10 +10,10 @@ walg_wal_archive_timeout: 3600
 # TODO: Make all this PG mess dynamic
 walg_user: postgres
 walg_group: postgres
-walg_postgres_home_dir: "/var/lib/pgsql"
-walg_pg_data_dir: "/var/lib/pgsql/data"
-walg_pg_config_path: "{{ walg_pg_data_dir }}"
-walg_pg_service: "postgresql"
+# walg_postgres_home_dir: ...
+# walg_pg_data_dir: ...
+# walg_pg_config_path: ...
+# walg_pg_service: ...
 walg_pg_global_config_options:
   - option: "wal_level"
     value: "replica"

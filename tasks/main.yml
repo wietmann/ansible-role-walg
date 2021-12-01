@@ -1,4 +1,7 @@
 ---
+- name: Include variables definition tasks
+  include_tasks: variables.yml
+
 - name: Gather info about WAL-G binary
   stat:
     path: "{{ walg_binary_dir }}/wal-g"

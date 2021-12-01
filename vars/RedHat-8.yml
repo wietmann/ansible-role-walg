@@ -1,0 +1,4 @@
+---
+_walg_pg_data_dir: "/var/lib/pgsql/data"
+_walg_pg_config_path: "/var/lib/pgsql/data"
+_walg_pg_service: postgresql
