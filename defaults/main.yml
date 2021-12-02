@@ -1,6 +1,6 @@
 ---
 walg_binary_dir: "/usr/local/bin"
-walg_version: "0.2.15"
+walg_version: "0.2.19"
 walg_logs_dir: "/var/log/wal-g"
 
 walg_wal_archive_timeout: 3600
