@@ -10,6 +10,12 @@
   - ansible_distribution != 'Fedora'
   - ansible_distribution != 'Amazon'
 
+- name: (RHEL) Include distro-specific variables (Rocky, AlmaLinux)
+  include_vars: "RedHat-{{ ansible_distribution_major_version }}.yml"
+  when:
+    - ansible_version.string is version('2.11', '<')
+    - ansible_os_family in ['AlmaLinux', 'Rocky']
+
 - name: Define walg_pg_data_dir
   set_fact:
     walg_pg_data_dir: "{{ _walg_pg_data_dir }}"
