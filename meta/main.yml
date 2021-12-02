@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  role_name: walg
+  namespace: wietmann
+  author: Dmitry Danilov <dima.danilov9867@gmail.com>
+  description: Setup and manage WAL-G PostgreSQL backup tool
+  license: MIT
+  min_ansible_version: 2.9
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+        - 8
+
+  galaxy_tags:
+    - linux
+    - postgresql
+    - pgsql
+    - postgres
+    - backup
+    - walg
+
+dependencies: []
