@@ -1,5 +1,6 @@
 ---
 walg_binary_dir: "/usr/local/bin"
+walg_binary_name: "wal-g"
 walg_version: "0.2.19"
 walg_logs_dir: "/var/log/wal-g"
 
@@ -20,7 +21,7 @@ walg_pg_global_config_options:
   - option: "archive_mode"
     value: "on"
   - option: "archive_command"
-    value: "{{ walg_binary_dir }}/wal-g wal-push \"%p\" >> {{ walg_logs_dir }}/wal-push.log 2>&1"
+    value: "{{ walg_binary_dir }}/{{ walg_binary_name }} wal-push \"%p\" >> {{ walg_logs_dir }}/wal-push.log 2>&1"
   - option: "archive_timeout"
     value: "{{ walg_wal_archive_timeout }}"
 
@@ -35,8 +36,8 @@ walg_configure_logrotate: True
 walg_configure_crontab: True
 walg_configure_pg_settings: True
 
-walg_backup_cmd: "{{ walg_binary_dir }}/wal-g backup-push {{ walg_pg_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
-walg_prune_cmd: "{{ walg_binary_dir }}/wal-g delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
+walg_backup_cmd: "{{ walg_binary_dir }}/{{ walg_binary_name }} backup-push {{ walg_pg_data_dir }} >> {{ walg_logs_dir }}/backup-push.log 2>&1"
+walg_prune_cmd: "{{ walg_binary_dir }}/{{ walg_binary_name }} delete retain FULL 12 >> {{ walg_logs_dir }}/delete.log 2>&1"
 
 walg_backup_cron_minute: "30"
 walg_backup_cron_hour: "0"

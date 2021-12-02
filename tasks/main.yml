@@ -4,13 +4,13 @@
 
 - name: Gather info about WAL-G binary
   stat:
-    path: "{{ walg_binary_dir }}/wal-g"
+    path: "{{ walg_binary_dir }}/{{ walg_binary_name }}"
   register: walg_binary_stats
 
 # TODO: Change to internal regex
 - name: Get WAL-G version
   shell:
-    cmd: "{{ walg_binary_dir }}/wal-g --version | sed 's/^.\\+\\(v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\).\\+$/\\1/'"
+    cmd: "{{ walg_binary_dir }}/{{ walg_binary_name }} --version | sed 's/^.\\+\\(v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\).\\+$/\\1/'"
   when: walg_binary_stats.stat.exists
   changed_when: false
   failed_when: false
@@ -19,12 +19,12 @@
 - name: Build download URL (pre 1.0.0)
   set_fact:
     walg_download_url: "https://github.com/wal-g/wal-g/releases/download/v{{ walg_version }}/wal-g.linux-amd64.tar.gz"
-  when: walg_version is version('1.0.0', '<')
+  when: walg_download_url is not defined and walg_version is version('1.0.0', '<')
 
 - name: Fail on too modern version
   fail:
     msg: "Versions >= 1.0.0 are not implemented yet"
-  when: walg_version is version('1.0.0', '>=')
+  when: walg_download_url is not defined and walg_version is version('1.0.0', '>=')
 
 # - fail:
 #     msg: DEBUG HALT
