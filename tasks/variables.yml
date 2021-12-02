@@ -6,9 +6,9 @@
 - name: (RHEL) Include distro-specific variables
   include_vars: "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
   when:
-  - ansible_os_family == 'RedHat'
-  - ansible_distribution != 'Fedora'
-  - ansible_distribution != 'Amazon'
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution != 'Fedora'
+    - ansible_distribution != 'Amazon'
 
 - name: (RHEL) Include distro-specific variables (Rocky, AlmaLinux)
   include_vars: "RedHat-{{ ansible_distribution_major_version }}.yml"
