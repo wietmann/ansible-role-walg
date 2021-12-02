@@ -34,3 +34,5 @@ provisioner:
 verifier:
   name: ansible
   # enabled: False
+lint: |
+  yamllint .
